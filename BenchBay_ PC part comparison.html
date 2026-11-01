@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BenchBay: compare PC parts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#e8edf1;--card:#f7f9fb;--ink:#13202b;--mute:#5b6b78;--line:#c5d0d9;--s1:#0d7c7c;--s2:#d98e04;--s3:#8a3f9e;--oc:#d6451f;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--paper:#0f1a22;--card:#16252f;--ink:#e6eef4;--mute:#93a5b3;--line:#2b3f4d;--s1:#35c2c2;--s2:#f2b43a;--s3:#c47ad9;--oc:#ff7a52}}
+:root[data-theme="dark"]{color-scheme:dark;--paper:#0f1a22;--card:#16252f;--ink:#e6eef4;--mute:#93a5b3;--line:#2b3f4d;--s1:#35c2c2;--s2:#f2b43a;--s3:#c47ad9;--oc:#ff7a52}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.5 "IBM Plex Sans",system-ui,sans-serif;
+background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:32px 32px;background-position:-1px -1px}
+body::before{content:"";position:fixed;inset:0;background:var(--paper);opacity:.82;z-index:-1}
+.wrap{max-width:1040px;margin:0 auto;padding:32px 20px 56px}
+h1{font:800 clamp(2rem,6vw,3.4rem)/1.02 "Bricolage Grotesque",system-ui,sans-serif;margin:0 0 10px;letter-spacing:-.02em}
+.lede{color:var(--mute);max-width:56ch;margin:0 0 28px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.tab{font:600 .95rem "IBM Plex Sans",sans-serif;padding:9px 16px;border:2px solid var(--ink);background:transparent;color:var(--ink);border-radius:999px;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--paper)}
+.tab:focus-visible,select:focus-visible,.sw button:focus-visible{outline:3px solid var(--s2);outline-offset:2px}
+.panel{background:var(--card);border:2px solid var(--ink);border-radius:14px;padding:18px}
+.controls{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.sw{display:inline-flex;border:2px solid var(--ink);border-radius:999px;overflow:hidden}
+.sw button{font:600 .9rem "IBM Plex Sans",sans-serif;padding:8px 16px;border:0;background:transparent;color:var(--ink);cursor:pointer}
+.sw button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.sw button.oc[aria-pressed="true"]{background:var(--oc);color:#fff}
+.hint{color:var(--mute);font-size:.88rem;margin:0}
+.scroll{overflow-x:auto}
+.grid{display:grid;grid-template-columns:150px repeat(var(--n),minmax(170px,1fr));min-width:max-content;width:100%}
+.grid>div{padding:12px 10px;border-top:1px solid var(--line)}
+.head{border-top:0!important;padding-top:0!important}
+select{width:100%;font:600 .95rem "IBM Plex Sans",sans-serif;padding:10px;border-radius:8px;border:2px solid var(--c,var(--ink));background:var(--card);color:var(--ink)}
+.lab{color:var(--mute);font-size:.9rem}
+.val{font-weight:600;font-variant-numeric:tabular-nums}
+.val small{font-weight:400;color:var(--mute)}
+.bar{height:8px;background:var(--line);border-radius:4px;margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--c);border-radius:4px;transition:width .35s}
+.win .val::after{content:" ✓ best";font-size:.78rem;color:var(--c);font-weight:600}
+.empty{color:var(--mute);font-style:italic}
+.note{margin-top:22px;color:var(--mute);font-size:.85rem;max-width:70ch}
+.oc-on .tag{display:inline}
+.tag{display:none;color:var(--oc);font-size:.8rem;font-weight:600;margin-left:6px}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Compare PC parts side by side.</h1>
+  <p class="lede">Pick up to three graphics cards, processors or memory kits. Flip between stock and overclocked numbers to see how much headroom each part has.</p>
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <div class="panel" id="panel">
+    <div class="controls">
+      <div class="sw" role="group" aria-label="Clock mode">
+        <button id="bStock" aria-pressed="true">Stock</button>
+        <button id="bOC" class="oc" aria-pressed="false">Overclocked</button>
+      </div>
+      <p class="hint" id="hint"></p>
+    </div>
+    <div class="scroll"><div class="grid" id="grid"></div></div>
+  </div>
+  <p class="note">Figures are approximate: launch prices in USD, performance shown as an index where 100 is the fastest part in its category. Overclock values are typical results, and every chip and memory kit overclocks differently, so treat them as a guide rather than a guarantee.</p>
+</div>
+<script>
+var CATS={
+gpu:{label:"Graphics cards",hint:"Overclock = typical boost clock and about 10% more power.",
+parts:[
+{n:"GeForce RTX 4090",mem:24,clk:2520,oc:2850,w:450,perf:100,gain:5,price:1599},
+{n:"GeForce RTX 4080 Super",mem:16,clk:2550,oc:2850,w:320,perf:78,gain:5,price:999},
+{n:"GeForce RTX 4070 Super",mem:12,clk:2475,oc:2800,w:220,perf:58,gain:6,price:599},
+{n:"GeForce RTX 4060",mem:8,clk:2460,oc:2800,w:115,perf:33,gain:6,price:299},
+{n:"Radeon RX 7900 XTX",mem:24,clk:2500,oc:2800,w:355,perf:76,gain:5,price:999},
+{n:"Radeon RX 7800 XT",mem:16,clk:2430,oc:2700,w:263,perf:52,gain:5,price:499}],
+fields:[
+{l:"Video memory",u:" GB",hi:true,g:function(p){return p.mem}},
+{l:"Boost clock",u:" MHz",hi:true,g:function(p,o){return o?p.oc:p.clk}},
+{l:"Board power",u:" W",hi:false,g:function(p,o){return Math.round(p.w*(o?1.1:1))}},
+{l:"Performance index",u:"",hi:true,g:function(p,o){return Math.round(p.perf*(o?1+p.gain/100:1))}},
+{l:"Price",u:"",pre:"$",hi:false,g:function(p){return p.price}},
+{l:"Performance per $100",u:"",hi:true,d:1,g:function(p,o){return p.perf*(o?1+p.gain/100:1)/p.price*100}}]},
+cpu:{label:"Processors",hint:"Overclock = typical boost clock and about 15% more power.",
+parts:[
+{n:"Ryzen 7 7800X3D",c:8,t:16,clk:5.0,oc:5.1,w:120,g:100,p:55,gain:2,price:449},
+{n:"Ryzen 9 7950X",c:16,t:32,clk:5.7,oc:5.8,w:170,g:90,p:100,gain:4,price:699},
+{n:"Ryzen 5 7600X",c:6,t:12,clk:5.3,oc:5.5,w:105,g:78,p:50,gain:4,price:299},
+{n:"Core i9-14900K",c:24,t:32,clk:6.0,oc:6.2,w:253,g:95,p:98,gain:4,price:589},
+{n:"Core i7-14700K",c:20,t:28,clk:5.6,oc:5.8,w:253,g:88,p:82,gain:4,price:409},
+{n:"Core i5-14600K",c:14,t:20,clk:5.3,oc:5.5,w:181,g:80,p:60,gain:4,price:319}],
+fields:[
+{l:"Cores",u:"",hi:true,g:function(p){return p.c}},
+{l:"Threads",u:"",hi:true,g:function(p){return p.t}},
+{l:"Max boost clock",u:" GHz",hi:true,d:1,g:function(p,o){return o?p.oc:p.clk}},
+{l:"Power limit",u:" W",hi:false,g:function(p,o){return Math.round(p.w*(o?1.15:1))}},
+{l:"Gaming index",u:"",hi:true,g:function(p,o){return Math.round(p.g*(o?1+p.gain/100:1))}},
+{l:"Productivity index",u:"",hi:true,g:function(p,o){return Math.round(p.p*(o?1+p.gain/100:1))}},
+{l:"Price",u:"",pre:"$",hi:false,g:function(p){return p.price}}]},
+ram:{label:"Memory (32 GB kits)",hint:"Overclock = typical manual speed and about 0.05 V more.",
+parts:[
+{n:"Kingston Fury Beast DDR5-5200",s:5200,cl:40,v:1.25,os:5600,price:85},
+{n:"Corsair Vengeance DDR5-5600",s:5600,cl:36,v:1.25,os:6000,price:90},
+{n:"Crucial Pro DDR5-5600",s:5600,cl:46,v:1.1,os:6000,price:80},
+{n:"G.Skill Trident Z5 DDR5-6000",s:6000,cl:30,v:1.35,os:6400,price:110},
+{n:"G.Skill Trident Z5 RGB DDR5-7200",s:7200,cl:34,v:1.4,os:7600,price:170},
+{n:"Corsair Dominator Titanium DDR5-8000",s:8000,cl:38,v:1.45,os:8400,price:260}],
+fields:[
+{l:"Speed",u:" MT/s",hi:true,g:function(p,o){return o?p.os:p.s}},
+{l:"CAS latency",u:" CL",hi:false,g:function(p){return p.cl}},
+{l:"Real latency",u:" ns",hi:false,d:1,g:function(p,o){return p.cl*2000/(o?p.os:p.s)}},
+{l:"Bandwidth (dual channel)",u:" GB/s",hi:true,d:1,g:function(p,o){return (o?p.os:p.s)*16/1000}},
+{l:"Voltage",u:" V",hi:false,d:2,g:function(p,o){return p.v+(o?0.05:0)}},
+{l:"Price",u:"",pre:"$",hi:false,g:function(p){return p.price}}]}
+};
+var COLORS=["var(--s1)","var(--s2)","var(--s3)"];
+var cat="gpu",oc=false,sel=[0,1,-1];
+function el(id){return document.getElementById(id)}
+function fmt(f,v){var s=(f.d!==undefined)?v.toFixed(f.d):String(Math.round(v));if(!f.d&&Math.abs(v)>=1000)s=Math.round(v).toLocaleString("en-US");return (f.pre||"")+s+(f.u||"")}
+function tabs(){
+  var t=el("tabs");t.innerHTML="";
+  Object.keys(CATS).forEach(function(k){
+    var b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");
+    b.setAttribute("aria-selected",k===cat);b.textContent=CATS[k].label;
+    b.onclick=function(){cat=k;sel=[0,1,-1];render();tabs()};t.appendChild(b)});
+}
+function render(){
+  var C=CATS[cat],g=el("grid"),chosen=[];
+  sel.forEach(function(i,s){if(i>=0)chosen.push(s)});
+  el("hint").textContent=C.hint;
+  el("panel").className="panel"+(oc?" oc-on":"");
+  g.style.setProperty("--n",3);g.innerHTML="";
+  function cell(html,cls,col){var d=document.createElement("div");if(cls)d.className=cls;if(col)d.style.setProperty("--c",col);d.innerHTML=html;g.appendChild(d);return d}
+  cell("","head");
+  for(var s=0;s<3;s++){
+    var opts=(s===2?'<option value="-1">Add a third part</option>':"")+C.parts.map(function(p,i){return '<option value="'+i+'"'+(sel[s]===i?" selected":"")+'>'+p.n+'</option>'}).join("");
+    var d=cell('<select aria-label="Part '+(s+1)+'">'+opts+'</select>',"head",COLORS[s]);
+    (function(sl){d.firstChild.onchange=function(e){sel[sl]=+e.target.value;render()}})(s);
+  }
+  C.fields.forEach(function(f){
+    var vals=sel.map(function(i){return i>=0?f.g(C.parts[i],oc):null});
+    var live=vals.filter(function(v){return v!==null});
+    var max=Math.max.apply(null,live),min=Math.min.apply(null,live);
+    var best=f.hi?max:min;
+    cell(f.l,"lab");
+    vals.forEach(function(v,s){
+      if(v===null){cell('<span class="empty">&ndash;</span>',"",COLORS[s]);return}
+      var win=live.length>1&&v===best&&max!==min;
+      var w=f.hi?(v/max*100):(min/v*100);
+      var h='<div class="val">'+fmt(f,v)+'<span class="tag">OC</span></div><div class="bar"><i style="width:'+w.toFixed(0)+'%"></i></div>';
+      cell(h,win?"win":"",COLORS[s]);
+    });
+  });
+}
+el("bStock").onclick=function(){oc=false;el("bStock").setAttribute("aria-pressed","true");el("bOC").setAttribute("aria-pressed","false");render()};
+el("bOC").onclick=function(){oc=true;el("bOC").setAttribute("aria-pressed","true");el("bStock").setAttribute("aria-pressed","false");render()};
+tabs();render();
+</script>
+</body>
+</html>
