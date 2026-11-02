@@ -8,10 +8,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--paper:#e8edf1;--card:#f7f9fb;--ink:#13202b;--mute:#5b6b78;--line:#c5d0d9;--s1:#0d7c7c;--s2:#d98e04;--s3:#8a3f9e;--oc:#d6451f;
+:root{--paper:#e8edf1;--card:#f7f9fb;--ink:#13202b;--mute:#5b6b78;--line:#c5d0d9;--s1:#0d7c7c;--s2:#d98e04;--s3:#200229;--oc:#d6451f;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--paper:#0f1a22;--card:#16252f;--ink:#e6eef4;--mute:#93a5b3;--line:#2b3f4d;--s1:#35c2c2;--s2:#f2b43a;--s3:#c47ad9;--oc:#ff7a52}}
-:root[data-theme="dark"]{color-scheme:dark;--paper:#0f1a22;--card:#16252f;--ink:#e6eef4;--mute:#93a5b3;--line:#2b3f4d;--s1:#35c2c2;--s2:#f2b43a;--s3:#c47ad9;--oc:#ff7a52}
+:root[data-theme="dark"]{color-scheme:dark;--paper:#0c2333;--card:#16252f;--ink:#e6eef4;--mute:#93a5b3;--line:#2b3f4d;--s1:#35c2c2;--s2:#f2b43a;--s3:#c47ad9;--oc:#ff7a52}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *,*::before,*::after{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.5 "IBM Plex Sans",system-ui,sans-serif;
@@ -29,7 +29,7 @@ h1{font:800 clamp(2rem,6vw,3.4rem)/1.02 "Bricolage Grotesque",system-ui,sans-ser
 .sw{display:inline-flex;border:2px solid var(--ink);border-radius:999px;overflow:hidden}
 .sw button{font:600 .9rem "IBM Plex Sans",sans-serif;padding:8px 16px;border:0;background:transparent;color:var(--ink);cursor:pointer}
 .sw button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
-.sw button.oc[aria-pressed="true"]{background:var(--oc);color:#fff}
+.sw button.oc[aria-pressed="true"]{background:var(--oc);color:#990202}
 .hint{color:var(--mute);font-size:.88rem;margin:0}
 .scroll{overflow-x:auto}
 .grid{display:grid;grid-template-columns:150px repeat(var(--n),minmax(170px,1fr));min-width:max-content;width:100%}
@@ -70,6 +70,9 @@ select{width:100%;font:600 .95rem "IBM Plex Sans",sans-serif;padding:10px;border
 var CATS={
 gpu:{label:"Graphics cards",hint:"Overclock = typical boost clock and about 10% more power.",
 parts:[
+{n:"GeForce RTX 5090",mem:32,clk:2820,oc:3450,w:575,perf:100,gain:5,price:1599},
+{n:"GeForce RTX 5080 TI",mem:24,clk:2720,oc:3350,w:400,perf:100,gain:5,price:1599},
+{n:"GeForce RTX 5080",mem:16,clk:2520,oc:2950,w:360,perf:100,gain:5,price:1599},
 {n:"GeForce RTX 4090",mem:24,clk:2520,oc:2850,w:450,perf:100,gain:5,price:1599},
 {n:"GeForce RTX 4080 Super",mem:16,clk:2550,oc:2850,w:320,perf:78,gain:5,price:999},
 {n:"GeForce RTX 4070 Super",mem:12,clk:2475,oc:2800,w:220,perf:58,gain:6,price:599},
